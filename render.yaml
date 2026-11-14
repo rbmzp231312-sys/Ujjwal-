@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ujjwal-ai-video-server
+    runtime: python
+    plan: free
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: HF_TOKEN
+        sync: false
