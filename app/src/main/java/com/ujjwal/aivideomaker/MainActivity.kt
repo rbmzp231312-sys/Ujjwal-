@@ -73,23 +73,18 @@ fun UjjwalApp() {
                 Text("चुना गया मोड: $mode")
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (mode == "Photo to Video") {
-                    Button(
-                        onClick = { photoPicker.launch("image/*") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(if (selectedPhoto == null) "📷 गैलरी से फोटो चुनें" else "📷 दूसरी फोटो चुनें")
-                    }
-                    Text(
-                        if (selectedPhoto == null) "पहले यह बटन दबाकर अपनी फोटो चुनें।"
-                        else "फोटो चुन ली गई है ✓",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    if (selectedPhoto != null) {
-                        Text("फोटो चुनी गई ✓", color = MaterialTheme.colorScheme.primary)
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { photoPicker.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (selectedPhoto == null) "📷 गैलरी से फोटो चुनें" else "📷 दूसरी फोटो चुनें")
                 }
+                Text(
+                    if (selectedPhoto == null) "फोटो से वीडियो बनाने के लिए यहाँ दबाकर फोटो चुनें।"
+                    else "फोटो चुन ली गई है ✓",
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
                     value = prompt,
