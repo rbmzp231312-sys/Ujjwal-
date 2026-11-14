@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -30,13 +31,13 @@ fun UjjwalApp() {
     var selectedPhoto by remember { mutableStateOf<Uri?>(null) }
 
     val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         selectedPhoto = uri
         message = if (uri != null) {
             "फोटो चुन ली गई है। अगला चरण वीडियो बनाना होगा।"
         } else {
-            "कोई फोटो नहीं चुनी गई।"
+            "फोटो नहीं चुनी गई। फिर से फोटो चुनें।"
         }
     }
 
@@ -49,43 +50,67 @@ fun UjjwalApp() {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(20.dp),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("UJJWAL AI", style = MaterialTheme.typography.headlineLarge)
-                Text("AI Video Maker", style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(30.dp))
+                Text("AI Video Maker • Version 1.3", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(22.dp))
 
                 Text("वीडियो बनाने का तरीका चुनें")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = {
-                        mode = "Text to Video"
-                        message = "अपना वीडियो बनाने का आइडिया लिखें।"
-                    }) { Text("Text to Video") }
-
-                    Button(onClick = {
-                        mode = "Photo to Video"
-                        message = "अपनी गैलरी से एक फोटो चुनें।"
-                    }) { Text("Photo to Video") }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-                Text("चुना गया मोड: $mode")
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    onClick = { photoPicker.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(if (selectedPhoto == null) "📷 गैलरी से फोटो चुनें" else "📷 दूसरी फोटो चुनें")
+                    Button(
+                        onClick = {
+                            mode = "Text to Video"
+                            message = "अपना वीडियो बनाने का आइडिया लिखें।"
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Text to Video") }
+
+                    Button(
+                        onClick = {
+                            mode = "Photo to Video"
+                            message = "नीचे बड़े फोटो चुनें बटन को दबाएँ।"
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Photo to Video") }
                 }
+
+                Spacer(modifier = Modifier.height(18.dp))
+                Text("चुना गया मोड: $mode", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Always-visible, high-contrast gallery action.
+                Button(
+                    onClick = {
+                        photoPicker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                ) {
+                    Text(
+                        if (selectedPhoto == null) "📷  फोटो चुनें — गैलरी खोलें"
+                        else "📷  दूसरी फोटो चुनें",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    if (selectedPhoto == null) "फोटो से वीडियो बनाने के लिए यहाँ दबाकर फोटो चुनें।"
-                    else "फोटो चुन ली गई है ✓",
+                    if (selectedPhoto == null) "ऊपर वाले नीले बटन को दबाकर फोन की फोटो चुनें।"
+                    else "फोटो सफलतापूर्वक चुन ली गई है ✓",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(12.dp))
 
+                Spacer(modifier = Modifier.height(18.dp))
                 OutlinedTextField(
                     value = prompt,
                     onValueChange = { prompt = it },
@@ -95,23 +120,23 @@ fun UjjwalApp() {
                     minLines = 3
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
                 Button(
                     onClick = {
                         message = when {
                             prompt.isBlank() -> "पहले वीडियो का आइडिया लिखें।"
                             mode == "Photo to Video" && selectedPhoto == null ->
-                                "पहले गैलरी से एक फोटो चुनें।"
+                                "पहले ऊपर फोटो चुनें बटन दबाकर फोटो चुनें।"
                             else ->
-                                "तुम्हारा आइडिया और फोटो तैयार हैं। असली MP4/AI वीडियो बनाने वाला इंजन अभी जोड़ना बाकी है; यह बटन अभी वीडियो एक्सपोर्ट नहीं करता।"
+                                "तुम्हारा आइडिया और फोटो तैयार हैं। असली AI/MP4 वीडियो इंजन अभी जोड़ना बाकी है; अभी वीडियो एक्सपोर्ट नहीं होता।"
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) { Text("वीडियो बनाएं") }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
                 Text(message, style = MaterialTheme.typography.bodyLarge)
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(26.dp))
                 Text("UJJWAL AI Video Maker © 2026")
             }
         }
