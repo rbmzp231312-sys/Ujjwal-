@@ -74,12 +74,17 @@ fun UjjwalApp() {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (mode == "Photo to Video") {
-                    OutlinedButton(
+                    Button(
                         onClick = { photoPicker.launch("image/*") },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(if (selectedPhoto == null) "गैलरी से फोटो चुनें" else "दूसरी फोटो चुनें")
+                        Text(if (selectedPhoto == null) "📷 गैलरी से फोटो चुनें" else "📷 दूसरी फोटो चुनें")
                     }
+                    Text(
+                        if (selectedPhoto == null) "पहले यह बटन दबाकर अपनी फोटो चुनें।"
+                        else "फोटो चुन ली गई है ✓",
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     if (selectedPhoto != null) {
                         Text("फोटो चुनी गई ✓", color = MaterialTheme.colorScheme.primary)
                     }
